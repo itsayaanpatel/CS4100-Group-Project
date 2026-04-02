@@ -25,7 +25,7 @@ class Block:
         self.y = y
         self.orientation = orientation
 
-    # updates block's anchor position (top-left most tile) based on action taken 
+    # updates block's anchor position (top-left most tile) based on action taken
     # and current orientation
     def move(self, action):
         x, y, o = self.x, self.y, self.orientation
@@ -57,22 +57,17 @@ class Block:
                 return Block(x, y - 1, UPRIGHT)
             elif action == RIGHT:
                 return Block(x, y + 2, UPRIGHT)
-    
-    # returns a list of all tiles covered by a block based on its
+
+    # returns a list of all tiles occupied by a block based on its
     # anchor position (top-left most tile) and orientation
-    def get_tiles(self):
+    def get_occupied_tiles(self):
         x, y, o = self.x, self.y, self.orientation
-        tiles_covered = []
-        tiles_covered.append((x, y))
-        if o == UPRIGHT: 
-            return tiles_covered
+        occupied_tiles = []
+        occupied_tiles.append((x, y))
+        if o == UPRIGHT:
+            return occupied_tiles
         elif o == VERTICAL:
-            tiles_covered.append((x + 1, y))
+            occupied_tiles.append((x + 1, y))
         elif o == HORIZONTAL:
-            tiles_covered.append((x, y + 1))
-        return tiles_covered
-
-
-        
-
-        
+            occupied_tiles.append((x, y + 1))
+        return occupied_tiles
