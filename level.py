@@ -1,3 +1,5 @@
+import block as blk
+
 # 0 = Empty tile
 # 1 = Floor tile
 # S = Start tile
@@ -17,7 +19,7 @@ def find_tile(tile, grid):
     for r, row in enumerate(grid):
         for c, col in enumerate(row):
             if col == tile:
-                return (c, r)
+                return (r, c)
     return None
 
 
@@ -45,3 +47,19 @@ class Level:
             if self.grid[r][c] == "0":
                 return False
         return True
+
+    # checks if a block wins the game if it is upright on the goal tile
+    def is_won(self, block):
+        x, y, o = block.x, block.y, block.orientation
+        goal_x, goal_y = self.goal_tile
+
+        return x == goal_x and y == goal_y and o == blk.UPRIGHT
+
+    # gets all next states that are valid for a given block
+    def get_next_states(self, block):
+        next_states = []
+        for action in [blk.UP, blk.DOWN, blk.LEFT, blk.RIGHT]:
+            new_block = block.move(action)
+            if self.is_valid(new_block):
+                next_states.append(new_block)
+        return next_states
