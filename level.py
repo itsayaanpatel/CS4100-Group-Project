@@ -61,5 +61,5 @@ class Level:
         for action in [blk.UP, blk.DOWN, blk.LEFT, blk.RIGHT]:
             new_block = block.move(action)
             if self.is_valid(new_block):
-                next_states.append(new_block)
+                next_states.append((new_block, action))
         return next_states
