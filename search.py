@@ -6,7 +6,7 @@ from level import Level, level_1_grid
 import time
 
 
-# Attempts to find optimal path for a level
+# Finds a path to goal tile with BFS
 # Returns list of actions, number of states explored, and time taken
 def bfs_with_stats(level):
     start_time = time.time()
@@ -25,8 +25,6 @@ def bfs_with_stats(level):
         if level.is_won(current_block):
             return actions, states_explored, time.time() - start_time
 
-        # adds all neighbor states of the current state into the queue
-        # when a neighbor state is added, it goes into the visited list so it can't be added again
         for next_block, action in level.get_next_states(current_block):
             state = (next_block.x, next_block.y, next_block.orientation)
             if state not in visited:
@@ -76,7 +74,7 @@ def astar_with_stats(level):
     return None, states_explored, time.time() - start_time
 
 
-# returns a list of actions as words instead of integers
+# prints
 def convert_actions(action_list):
     actions = []
     action_names = {
@@ -92,6 +90,8 @@ def convert_actions(action_list):
 
 level = Level(level_1_grid)
 
+#Changed up the print format to show the number of states explored and
+#  time taken for each algorithm. This will help in comparing the efficiency of BFS and A* on the given level.
 solution, states_explored, time_taken = bfs_with_stats(level)
 print("BFS:", convert_actions(solution), f"| states: {states_explored} | time: {time_taken:.6f}s")
 
