@@ -30,7 +30,32 @@ def bfs_with_stats(level):
             if state not in visited:
                 visited.add(state)
                 queue.append((next_block, actions + [action]))
-    return None, states_explored, time.time() - start_time
+
+
+# Runs BFS and returns
+def bfs_states(level):
+    start_x, start_y = level.start_tile
+    start_block = Block(start_x, start_y)
+
+    queue = [(start_block, [])]
+    visited = {(start_block.x, start_block.y, start_block.orientation)}
+    states_explored = 0
+
+    while queue:
+        current_block, actions = queue.pop(0)
+        states_explored += 1
+
+        # yields the current block being explored
+        yield current_block, actions
+
+        if level.is_won(current_block):
+            return  # stops the function if it explores a block that is on the goal
+
+        for next_block, action in level.get_next_states(current_block):
+            state = (next_block.x, next_block.y, next_block.orientation)
+            if state not in visited:
+                visited.add(state)
+                queue.append((next_block, actions + [action]))
 
 
 def heuristic(block, goal_tile):
@@ -69,7 +94,9 @@ def astar_with_stats(level):
                 new_g = g + 1
                 new_f = new_g + heuristic(next_block, level.goal_tile)
                 counter += 1
-                heapq.heappush(heap, (new_f, new_g, counter, next_block, actions + [action]))
+                heapq.heappush(
+                    heap, (new_f, new_g, counter, next_block, actions + [action])
+                )
 
     return None, states_explored, time.time() - start_time
 
@@ -88,12 +115,20 @@ def convert_actions(action_list):
     return actions
 
 
-level = Level(level_1_grid)
+# level = Level(level_1_grid)
 
-#Changed up the print format to show the number of states explored and
-#  time taken for each algorithm. This will help in comparing the efficiency of BFS and A* on the given level.
-solution, states_explored, time_taken = bfs_with_stats(level)
-print("BFS:", convert_actions(solution), f"| states: {states_explored} | time: {time_taken:.6f}s")
+# # Changed up the print format to show the number of states explored and
+# #  time taken for each algorithm. This will help in comparing the efficiency of BFS and A* on the given level.
+# solution, states_explored, time_taken = bfs_with_stats(level)
+# print(
+#     "BFS:",
+#     convert_actions(solution),
+#     f"| states: {states_explored} | time: {time_taken:.6f}s",
+# )
 
-solution, states_explored, time_taken = astar_with_stats(level)
-print("A*: ", convert_actions(solution), f"| states: {states_explored} | time: {time_taken:.6f}s")
+# solution, states_explored, time_taken = astar_with_stats(level)
+# print(
+#     "A*: ",
+#     convert_actions(solution),
+#     f"| states: {states_explored} | time: {time_taken:.6f}s",
+# )
