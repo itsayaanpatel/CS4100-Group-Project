@@ -7,11 +7,13 @@ from search import bfs_states, bfs_with_stats, convert_actions
 
 # Color constants
 RESET = "\033[0m"
-FLOOR = "\033[37m"  # white
-VOID = "\033[30m"  # black
-BLOCK = "\033[36m"  # cyan
-GOAL = "\033[32m"  # green
-VISITED = "\033[33m"  # yellow
+FLOOR = "\033[37m"   # white
+VOID = "\033[30m"    # black
+BLOCK = "\033[36m"   # cyan
+GOAL = "\033[32m"    # green
+VISITED = "\033[33m" # yellow
+BUTTON = "\033[35m"  # magenta — soft (O) and hard (X) buttons
+BRIDGE = "\033[34m"  # blue — active bridge tiles
 
 
 # Prints a game state to the terminal
@@ -27,11 +29,15 @@ def render_grid(level, block, visited=None, show_block=True):
                 line += BLOCK + "██" + RESET
             elif tile == "G":
                 line += GOAL + "██" + RESET
-            elif visited and (r, c) in visited:  # first checks if visited exists
+            elif tile in ("O", "X"):
+                line += BUTTON + "██" + RESET
+            elif level.bridge_states.get((r, c), False):
+                line += BRIDGE + "██" + RESET
+            elif visited and (r, c) in visited:
                 line += VISITED + "██" + RESET
             elif tile == "0":
                 line += VOID + "██" + RESET
-            elif tile == "1" or tile == "S":
+            elif tile in ("1", "S"):
                 line += FLOOR + "██" + RESET
         print(line)
 
@@ -41,12 +47,13 @@ def clear_screen():
     os.system("clear")
 
 
-# Prints BFS exploration in terminal
-# Displays visited tiles as yellow, the current tile(s) as blue, the goal tile as green
+# Animates BFS exploration — yellow=visited, cyan=current block, green=goal, blue=active bridge
 def animate_bfs(level):
     explored = set()
-    for current_block, actions in bfs_states(level):
+    for current_block, actions, bridge_states in bfs_states(level):
         explored.update(current_block.get_occupied_tiles())
+        # sync level.bridge_states so render_grid shows active bridges correctly
+        level.bridge_states = {tile: (tile in bridge_states) for tile in level._initial_bridge_tiles}
         clear_screen()
         render_grid(level, current_block, explored)
         time.sleep(0.5)
@@ -54,9 +61,9 @@ def animate_bfs(level):
             return actions
 
 
-#
-#
+# Replays a solution path step by step
 def animate_path(level, actions):
+    level.reset_bridges()
     block = Block(level.start_tile[0], level.start_tile[1])
 
     for action in actions:
@@ -64,6 +71,7 @@ def animate_path(level, actions):
         render_grid(level, block)
         time.sleep(0.8)
         block = block.move(action)
+        level.activate_buttons(block)  # update bridges as block moves
 
     clear_screen()
     render_grid(level, block)
@@ -73,11 +81,9 @@ def animate_path(level, actions):
     render_grid(level, block, show_block=False)
 
 
-level1 = Level(HARDCODED_LEVELS[0]["grid"])
-block = Block(level1.start_tile[0], level1.start_tile[1])
-# render_grid(level1, block)
+data = HARDCODED_LEVELS[0]  # change index to switch levels (0=L1, 1=L2, 2=L3)
+level = Level(data["grid"], data.get("buttons", {}), data.get("bridge_tiles", []))
+block = Block(level.start_tile[0], level.start_tile[1])
 
-actions = animate_bfs(level1)
-# animate_bfs(level1)
-
-animate_path(level1, actions)
+actions = animate_bfs(level)
+animate_path(level, actions)

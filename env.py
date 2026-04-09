@@ -11,6 +11,7 @@ class BloxorzEnv:
     def reset(self):
         x, y = self.level.start_tile
         self.block = Block(x, y)
+        self.level.reset_bridges()
         return self._get_state()
 
     def step(self, action):
@@ -24,6 +25,7 @@ class BloxorzEnv:
             return self._get_state(), -1.0, True      # fell off
 
         self.block = new_block
+        self.level.activate_buttons(self.block)       # toggle bridges if on a button
         return self._get_state(), -0.01, False        # step penalty
 
     def render(self):
