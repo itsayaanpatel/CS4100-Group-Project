@@ -31,10 +31,10 @@ def render_grid(level, block, visited=None, show_block=True):
                 line += GOAL + "██" + RESET
             elif tile in ("O", "X"):
                 line += BUTTON + "██" + RESET
-            elif level.bridge_states.get((r, c), False):
-                line += BRIDGE + "██" + RESET
             elif visited and (r, c) in visited:
                 line += VISITED + "██" + RESET
+            elif level.bridge_states.get((r, c), False):
+                line += BRIDGE + "██" + RESET
             elif tile == "0":
                 line += VOID + "██" + RESET
             elif tile in ("1", "S"):
@@ -59,7 +59,7 @@ def animate_bfs(level):
         clear_screen()
         print(f"BFS EXPLORING | States visited: ", states_count)
         render_grid(level, current_block, explored)
-        time.sleep(0.3)
+        time.sleep(0.1)
         if level.is_won(current_block):
             return actions
 
@@ -99,14 +99,14 @@ def animate_astar(level):
         clear_screen()
         print(f"A* EXPLORING | States visited: {states_count}")
         render_grid(level, current_block, explored)
-        time.sleep(0.3)
+        time.sleep(0.1)
         if level.is_won(current_block):
             return actions
 
-data = HARDCODED_LEVELS[1]  # change index to switch levels (0=L1, 1=L2, 2=L3)
-level = Level(data["grid"], data.get("buttons", {}), data.get("bridge_tiles", []))
-block = Block(level.start_tile[0], level.start_tile[1])
+# data = HARDCODED_LEVELS[1]  # change index to switch levels (0=L1, 1=L2, 2=L3)
+# level = Level(data["grid"], data.get("buttons", {}), data.get("bridge_tiles", []))
+# block = Block(level.start_tile[0], level.start_tile[1])
 
 # actions = animate_bfs(level)
-actions = animate_astar(level)
-animate_path(level, actions)
+# actions = animate_astar(level)
+# animate_path(level, actions)
