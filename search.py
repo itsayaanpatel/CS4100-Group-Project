@@ -105,6 +105,43 @@ def astar_with_stats(level):
 
     return None, states_explored, time.time() - start_time
 
+# Generator version of A* — yields each block for visualization
+# Also yields bridge_states so the visualizer can render active bridge tiles
+def astar_states(level):
+
+    start_x, start_y = level.start_tile
+    start_block = Block(start_x, start_y)
+    start_bridges = frozenset()
+
+    counter = 0
+    heap = [(0, 0, counter, start_block, start_bridges, [])]
+    visited = set()
+
+    while heap:
+        f, g, _, current_block, bridge_states, actions = heapq.heappop(heap)
+
+        state = (current_block.x, current_block.y, current_block.orientation, bridge_states)
+        if state in visited:
+            continue
+        visited.add(state)
+
+        yield current_block, actions, bridge_states
+
+        if level.is_won(current_block):
+            return
+
+        for next_block, action, new_bridges in level.get_next_states_with_bridges(current_block, bridge_states):
+            next_state = (next_block.x, next_block.y, next_block.orientation, new_bridges)
+            if next_state not in visited:
+                new_g = g + 1
+                new_f = new_g + heuristic(next_block, level.goal_tile)
+                counter += 1
+                heapq.heappush(
+                    heap, (new_f, new_g, counter, next_block, new_bridges, actions + [action])
+                )
+
+    return
+
 
 # prints
 def convert_actions(action_list):
